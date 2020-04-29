@@ -1,0 +1,172 @@
+<html>
+<title>
+    Image Density Calculation
+</title>
+
+<head>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+
+
+    <style>
+        #dropFileForm {
+            margin: 16px;
+            text-align: center;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: 0.5s;
+        }
+
+        #dropFileForm #fileLabel {
+            background-color: rgba(143, 153, 143, 0.5);
+            display: block;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        #dropFileForm #fileInput {
+            display: none;
+        }
+
+        #dropFileForm #fileLabel:after,
+        #dropFileForm #fileLabel:before {
+            position: absolute;
+            content: "";
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            z-index: -2;
+            border-radius: 8px 8px 0 0;
+        }
+
+        #dropFileForm #fileLabel:before {
+            z-index: -1;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 5%,
+                    black 5%,
+                    black 10%);
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        #dropFileForm.fileHover #fileLabel:before {
+            opacity: 0.25;
+        }
+
+        #dropFileForm .uploadButton {
+            border: 0;
+            outline: 0;
+            width: 100%;
+            padding: 8px;
+            background-color: rgb(107, 114, 107);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #dropFileForm.fileHover {
+            box-shadow: 0 0 16px;
+        }
+        
+        p.info {
+            font-size: larger;
+        }
+
+        p.result_class{
+            font-size: x-large;
+            text-align: center;
+        }
+
+        .center{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <h1> Image density calculation </h1>
+    <p class="info">To find the number of people present in an image, upload the image by clicking following box. Once image is selected, the name of the image will be displayed in the same box. Once name appears you can press "upload" to start the computation. After some time result will be displayed. </p>
+    <br>
+    
+    <form id="dropFileForm" action="{% url 'dataProcess' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="images" id="fileInput" onchange="addFiles(event);">
+
+        <label for="fileInput" id="fileLabel" ondragover="overrideDefault(event);fileHover();"
+            ondragenter="overrideDefault(event);fileHover();" ondragleave="overrideDefault(event);fileHoverEnd();"
+            ondrop="overrideDefault(event);fileHoverEnd();addFiles(event);">
+            <i class="fa fa-download fa-5x"></i>
+            <br>
+            <span id="fileLabelText">
+                Choose a file
+            </span>
+            <br>
+        </label>
+        <input type="submit" value="Upload" class="uploadButton">
+    </form>
+    {% if count %}
+        <h3>Number of people pressent in given image: {{count}}</h3>
+    {% endif %}
+    
+    {% if input_data or output_data %}
+    <span>
+        <p class="result_class">Image received:</p>
+        <img class="center" src={{input_data}} width=800 height=460>
+        <p class="result_class">Result:</p>
+        <img class="center" src={{output_data}} width=800 height=460>
+
+    </span>
+    {% endif %}
+
+
+    <script>
+        var dropFileForm = document.getElementById("dropFileForm");
+        var fileLabelText = document.getElementById("fileLabelText");
+        var uploadStatus = document.getElementById("uploadStatus");
+        var fileInput = document.getElementById("fileInput");
+        var droppedFiles;
+
+        function overrideDefault(event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        function fileHover() {
+            dropFileForm.classList.add("fileHover");
+        }
+
+        function fileHoverEnd() {
+            dropFileForm.classList.remove("fileHover");
+        }
+
+        function addFiles(event) {
+            droppedFiles = event.target.files || event.dataTransfer.files;
+            showFiles(droppedFiles);
+        }
+
+        function showFiles(files) {
+            fileLabelText.innerText = files[0].name;
+        }
+
+
+        function uploadFiles(event) {
+            event.preventDefault();
+            changeStatus("Uploading...");
+        }
+
+        function changeStatus(text) {
+            uploadStatus.innerText = text;
+        }
+
+    </script>
+
+</body>
+
+</html>
