@@ -4,8 +4,7 @@
 </title>
 
 <head>
-    <link rel="stylesheet" type="text/css"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
 
 
     <style>
@@ -16,19 +15,19 @@
             overflow: hidden;
             transition: 0.5s;
         }
-
+        
         #dropFileForm #fileLabel {
-            background-color: rgba(143, 153, 143, 0.5);
+            background-color: rgba(185, 182, 182, 0.5);
             display: block;
             padding: 16px;
             position: relative;
             cursor: pointer;
         }
-
+        
         #dropFileForm #fileInput {
             display: none;
         }
-
+        
         #dropFileForm #fileLabel:after,
         #dropFileForm #fileLabel:before {
             position: absolute;
@@ -41,22 +40,18 @@
             z-index: -2;
             border-radius: 8px 8px 0 0;
         }
-
+        
         #dropFileForm #fileLabel:before {
             z-index: -1;
-            background: repeating-linear-gradient(45deg,
-                    transparent,
-                    transparent 5%,
-                    black 5%,
-                    black 10%);
+            background: repeating-linear-gradient(45deg, transparent, transparent 5%, black 5%, black 10%);
             opacity: 0;
             transition: 0.5s;
         }
-
+        
         #dropFileForm.fileHover #fileLabel:before {
             opacity: 0.25;
         }
-
+        
         #dropFileForm .uploadButton {
             border: 0;
             outline: 0;
@@ -66,67 +61,175 @@
             color: #fff;
             cursor: pointer;
         }
-
+        
         #dropFileForm.fileHover {
+            box-shadow: 0 0 16px;
+        }
+        
+        #dropFileFormVideo {
+            margin: 16px;
+            text-align: center;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: 0.5s;
+        }
+        
+        #dropFileFormVideo #fileLabelVideo {
+            background-color: rgba(185, 182, 182, 0.5);
+            display: block;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        #dropFileFormVideo #fileInputVideo {
+            display: none;
+        }
+        
+        #dropFileFormVideo #fileLabelVideo:after,
+        #dropFileFormVideo #fileLabelVideo:before {
+            position: absolute;
+            content: "";
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            z-index: -2;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        #dropFileFormVideo #fileLabelVideo:before {
+            z-index: -1;
+            background: repeating-linear-gradient(45deg, transparent, transparent 5%, black 5%, black 10%);
+            opacity: 0;
+            transition: 0.5s;
+        }
+        
+        #dropFileFormVideo.fileHoverVideo #fileLabelVideo:before {
+            opacity: 0.25;
+        }
+        
+        #dropFileFormVideo .uploadButtonVideo {
+            border: 0;
+            outline: 0;
+            width: 100%;
+            padding: 8px;
+            background-color: rgb(107, 114, 107);
+            color: #fff;
+            cursor: pointer;
+        }
+        
+        #dropFileFormVideo.fileHoverVideo {
             box-shadow: 0 0 16px;
         }
         
         p.info {
             font-size: larger;
         }
-
-        p.result_class{
+        
+        p.result_class {
             font-size: x-large;
             text-align: center;
         }
-
-        .center{
+        
+        .center {
             display: block;
             margin-left: auto;
             margin-right: auto;
         }
-
+        
+        body {
+            background: #c1c9d1;
+        }
     </style>
 </head>
 
 <body>
 
-    <h1> Image density calculation </h1>
-    <p class="info">To find the number of people present in an image, upload the image by clicking following box. Once image is selected, the name of the image will be displayed in the same box. Once name appears you can press "upload" to start the computation. After some time result will be displayed. </p>
+    <h1> Object Detection </h1>
+    <p class="info">Detects the objcets from the image and video.</p>
     <br>
-    
-    <form id="dropFileForm" action="{% url 'dataProcess' %}" method="post" enctype="multipart/form-data">
+
+    <!-- For Images -->
+    <form id="dropFileForm" action="{% url 'dataProcessImg' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="images" id="fileInput" onchange="addFiles(event);">
 
-        <label for="fileInput" id="fileLabel" ondragover="overrideDefault(event);fileHover();"
-            ondragenter="overrideDefault(event);fileHover();" ondragleave="overrideDefault(event);fileHoverEnd();"
-            ondrop="overrideDefault(event);fileHoverEnd();addFiles(event);">
+        <label for="fileInput" id="fileLabel" ondragover="overrideDefault(event);fileHover();" ondragenter="overrideDefault(event);fileHover();" ondragleave="overrideDefault(event);fileHoverEnd();" ondrop="overrideDefault(event);fileHoverEnd();addFiles(event);">
             <i class="fa fa-download fa-5x"></i>
             <br>
             <span id="fileLabelText">
-                Choose a file
+                Choose an image file
             </span>
             <br>
         </label>
-        <input type="submit" value="Upload" class="uploadButton">
+        <input type="submit" value="Upload Image" class="uploadButton">
     </form>
-    {% if count %}
-        <h3>Number of people pressent in given image: {{count}}</h3>
-    {% endif %}
-    
-    {% if input_data or output_data %}
+    <br> {% if count_image %}
+    <h3>Number of objects in given image: {{count_image}}</h3>
+    <ul>
+        <h3>Objects Detected are : </h3>
+        {% for eachobject in object_image_data %}
+        <li>Object : {{ eachobject.0 }},&nbsp;&nbsp;&nbsp;&nbsp; location : {{ eachobject.1 }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %} {% if input_image_data or output_image_data %}
     <span>
         <p class="result_class">Image received:</p>
-        <img class="center" src={{input_data}} width=800 height=460>
+        <img class="center" src={{input_image_data}} width=640 height=480>
         <p class="result_class">Result:</p>
-        <img class="center" src={{output_data}} width=800 height=460>
+        <img class="center" src={{output_image_data}} width=640 height=480>
 
-    </span>
-    {% endif %}
+    </span> {% endif %}
+    <br>
+
+    <!-- For Videos -->
+    <form id="dropFileFormVideo" action="{% url 'dataProcessVideo' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="videos" id="fileInputVideo" onchange="addFilesVideo(event);">
+
+        <label for="fileInputVideo" id="fileLabelVideo" ondragover="overrideDefaultVideo(event);fileHoverVideo();" ondragenter="overrideDefaultVideo(event);fileHoverVideo();" ondragleave="overrideDefaultVideo(event);fileHoverEndVideo();" ondrop="overrideDefaultVideo(event);fileHoverEndVideo();addFilesVideo(event);">
+            <i class="fa fa-download fa-5x"></i>
+            <br>
+            <span id="fileLabelTextVideo">
+                Choose a video file
+            </span>
+            <br>
+        </label>
+        <input type="submit" value="Upload Video" class="uploadButtonVideo">
+    </form>
+    <br>
+
+    <br> {% if count_video %}
+    <h3>Number of objects in given video: {{count_video}}</h3>
+    <ul>
+        <h3>Objects Detected are : </h3>
+        {% for eachobject in object_video_data %}
+        <li>
+            <ol>
+                {% for key, value in eachobject.items %}
+                <li>Objects : {{ key }},&nbsp;&nbsp;&nbsp;&nbsp; Quantity : {{ value }}</li>
+                {% endfor %}
+            </ol>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %} {% if input_video_data or output_video_data %}
+    <span>
+        <p class="result_class">Video received:</p>
+        <video class="center" width="640" height="480" controls="controls" preload="none" onclick="this.play()">
+            <source src={{input_video_data}} type="video/mp4">
+        </video>
+        <p class="result_class">Result:</p>
+        <p class="result_class">.AVI videos cannot be played on the current browser.</p>
+        <p class="result_class">Link for the output video : {{output_video_data}} </p>
+    </span> {% endif %}
+    <br>
 
 
     <script>
+        // Image
         var dropFileForm = document.getElementById("dropFileForm");
         var fileLabelText = document.getElementById("fileLabelText");
         var uploadStatus = document.getElementById("uploadStatus");
@@ -165,6 +268,45 @@
             uploadStatus.innerText = text;
         }
 
+
+        // Video
+        var dropFileFormVideo = document.getElementById("dropFileFormVideo");
+        var fileLabelTextVideo = document.getElementById("fileLabelTextVideo");
+        var uploadStatusVideo = document.getElementById("uploadStatusVideo");
+        var fileInputVideo = document.getElementById("fileInputVideo");
+        var droppedFilesVideo;
+
+        function overrideDefaultVideo(event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        function fileHoverVideo() {
+            dropFileFormVideo.classList.add("fileHoverVideo");
+        }
+
+        function fileHoverEndVideo() {
+            dropFileFormVideo.classList.remove("fileHoverVideo");
+        }
+
+        function addFilesVideo(event) {
+            droppedFilesVideo = event.target.files || event.dataTransfer.files;
+            showFilesVideo(droppedFilesVideo);
+        }
+
+        function showFilesVideo(files) {
+            fileLabelTextVideo.innerText = files[0].name;
+        }
+
+
+        function uploadFilesVideo(event) {
+            event.preventDefault();
+            changeStatusVideo("Uploading...");
+        }
+
+        function changeStatusVideo(text) {
+            uploadStatusVideo.innerText = text;
+        }
     </script>
 
 </body>
