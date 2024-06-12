@@ -1,4 +1,5 @@
-# Image_Density_Calculation
+# Object Detection
+  Welcome to the Object Classification Model repository! This project focuses on developing a robust object detection system to identify various objects within images and videos accurately. Leveraging the RetinaNet architecture, I achieved an impressive accuracy rate of 94.326% in detecting multiple objects simultaneously. This repository contains the codebase and documentation for replicating and extending our work.
 
 # Models
   Before running the main script, you must download the models from [here](https://drive.google.com/drive/folders/1TNtiZDp_BjPAa9T7x1YiD3QcNTADgcrN?usp=sharing). The folder linked has three models:  
